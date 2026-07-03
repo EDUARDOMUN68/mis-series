@@ -1,4 +1,4 @@
-const CACHE='mis-series-v2';
+const CACHE='mis-series-v3';
 const ASSETS=['./','./index.html','./manifest.json','./icon.svg'];
 
 self.addEventListener('install', event => {
