@@ -91,7 +91,7 @@
     const exact = titles.filter(t => normal(name) === normal(t.name) || normal(name) === normal(t.original_name));
     // A second page might contain another identically named show. Never guess a remake or a fuzzy title.
     const automatic = exact.length === 1 && !(payload.total_pages > 1) && !linkedIds.includes(exact[0].id) ? exact[0] : null;
-    return {automatic, candidates:titles.filter(t => !linkedIds.includes(t.id)).slice(0,10)};
+    return {automatic, candidates:(exact.length ? exact : titles).filter(t => !linkedIds.includes(t.id)).slice(0,10)};
   }
   function linkIdentity(collection, targetId, title, providers) {
     const next = structuredClone(collection);

@@ -18,7 +18,7 @@
       channel.port1.onmessage = event => { clearTimeout(timer); channel.port1.close(); resolve(event.data); };
       controller.postMessage('SERIES_CACHE_VERSION', [channel.port2]);
     });
-    if (version !== 'mis-series-1.0.2') throw new Error('La app está renovando su versión. Recarga la página y vuelve a conectar; no borres los datos del sitio.');
+    if (version !== 'mis-series-1.0.3') throw new Error('La app está renovando su versión. Recarga la página y vuelve a conectar; no borres los datos del sitio.');
   }
 
   async function api(path, params = {}) {
@@ -218,7 +218,8 @@
     for (const title of candidates) {
       const button=document.createElement('button'); button.className='secondary';
       button.disabled=bulkRunning;bulkChoiceButtons.push(button);
-      button.textContent=`${title.name} · ${title.first_air_date?.slice(0,4) || 'año sin confirmar'}`;
+      const country=title.origin_country?.length ? ' · '+title.origin_country.join(', ') : '';
+      button.textContent=`${title.name} · ${title.first_air_date?.slice(0,4) || 'año sin confirmar'}${country}${title.overview ? ' — '+title.overview.slice(0,180) : ''}`;
       button.onclick=()=>linkChoice(id,title,row); choices.append(button);
     }
     const manual=document.createElement('button');manual.className='secondary';manual.textContent='Buscar otro título';
@@ -264,7 +265,7 @@
           }
         }catch(e){errors++;rowMessage(row,e.message);renderChoices(item.id,[],row);}
       }
-      text('bulkStatus',`${bulkStop?'Búsqueda detenida. ':''}${linked} vinculadas automáticamente; ${review} por elegir; ${errors} consultas fallidas. Después puedes pulsar Actualizar temporadas.`);
+      text('bulkStatus',`${bulkStop?'Búsqueda detenida. ':''}${linked} vinculadas automáticamente; ${review} por elegir; ${errors} consultas fallidas. Total: ${series.filter(s=>s.tmdbId).length} de ${series.length} vinculadas. Después puedes pulsar Actualizar temporadas.`);
       text('catalogStatus',`${series.filter(s=>s.tmdbId).length} de ${series.length} series vinculadas. Tus vistos se conservan.`);
     }finally{bulkRunning=false;catalogBusy=false;$('bulkStart').disabled=false;bulkChoiceButtons.forEach(button=>button.disabled=false);}
   };

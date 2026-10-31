@@ -16,7 +16,7 @@ Las ofertas por serie y temporada no demuestran disponibilidad española de cada
 
 ## Caché y comprobaciones
 
-sw.js versión mis-series-1.0.2 precarga recursos propios de interfaz. Solo intercepta esos recursos del mismo origen; nunca intercepta API externa ni persiste credenciales. Prioriza red y conserva respaldo sin conexión. La colección y el token no se gestionan mediante caché de red.
+sw.js versión mis-series-1.0.3 precarga recursos propios de interfaz. Solo intercepta esos recursos del mismo origen; nunca intercepta API externa ni persiste credenciales. Prioriza red y conserva respaldo sin conexión. La colección y el token no se gestionan mediante caché de red.
 
 La vinculación colectiva usa matchCandidates (nombre exacto normalizado, identidad única y una sola página de resultados) y linkIdentity (solo metadatos de vínculo, sin tocar episodios). Las decisiones ambiguas quedan en el diálogo hasta que se elijan o se omitan; las ya guardadas se omiten en la siguiente ejecución. La primera copia de seguridad previa a la operación está en misSeries.v1.before-bulk-link. No contiene token ni se envía al servidor.
 

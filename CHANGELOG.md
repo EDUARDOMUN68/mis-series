@@ -1,5 +1,10 @@
 # Registro de cambios
 
+## 1.0.3 — 31 de octubre de 2026
+
+- Opciones ambiguas con país y sinopsis para distinguir series con el mismo título y año. Prioridad a coincidencias exactas entre las opciones, con búsqueda manual alternativa.
+- El resultado de vinculación muestra también el total de series ya vinculadas.
+
 ## 1.0.2 — 31 de octubre de 2026
 
 - Botón Vincular mis series: búsqueda colectiva, coincidencias exactas y únicas, elección manual de títulos dudosos con año y posibilidad de detener/reanudar.
