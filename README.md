@@ -1,4 +1,4 @@
-# Mis Series 1.0.3
+# Mis Series 1.0.4
 
 Aplicación web personal para llevar el seguimiento de series y capítulos vistos. Funciona con archivos estáticos y guarda tu colección en el navegador.
 
@@ -38,3 +38,5 @@ Importar combina el progreso: un capítulo visto en cualquiera de las dos copias
 ## Desarrollo
 
 Ejecutar `python -m http.server 8001` y abrir http://localhost:8001. No necesita compilación. Pruebas: `node --test test_catalog.js test_catalog_flow.js`. Las pruebas de catálogo usan respuestas de prueba, no credenciales reales. Consultar [arquitectura](docs/ARQUITECTURA.md) y [cambios](CHANGELOG.md).
+
+Al actualizar temporadas aparece un resumen por serie: temporadas y capítulos nuevos, ausencia de novedades y consultas fallidas. El resumen permanece en pantalla hasta la siguiente consulta o recarga.

@@ -106,7 +106,18 @@
     // A link is not a successful season refresh. Leave catalogCheckedAt untouched.
     return next;
   }
-  const api = {mergeCatalog, providersES, mergeImport, matchCandidates, linkIdentity};
+  function catalogChanges(before, after) {
+    const oldSeasons = new Map((before?.seasons || []).map(s => [s.number, s]));
+    let seasons = 0, episodes = 0;
+    for (const season of after.seasons || []) {
+      const old = oldSeasons.get(season.number);
+      if (!old) seasons++;
+      const numbers = new Set((old?.episodes || []).map(e => e.number));
+      episodes += (season.episodes || []).filter(e => !numbers.has(e.number)).length;
+    }
+    return {seasons, episodes};
+  }
+  const api = {catalogChanges, mergeCatalog, providersES, mergeImport, matchCandidates, linkIdentity};
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else root.SeriesCatalog = api;
 })(typeof window === 'undefined' ? globalThis : window);

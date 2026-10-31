@@ -1,3 +1,7 @@
+# 1.0.4 — Resumen de actualización
+
+Al actualizar temporadas se muestra un resumen desplegable con temporadas y capítulos añadidos, series sin novedades y errores por serie. Se conservan vistos y notas.
+
 # Registro de cambios
 
 ## 1.0.3 — 31 de octubre de 2026

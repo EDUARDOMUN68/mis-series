@@ -82,3 +82,11 @@ test('vincular identidad conserva todos los episodios, marcas y notas; evita dob
   assert.throws(()=>linkIdentity([...linked,{...current(),id:'otra'}],'otra',{id:9,name:'TMDB'},{}));
   assert.throws(()=>linkIdentity(collection,'eliminada',{id:9,name:'TMDB'},{}));
 });
+
+ test('summary counts new season and episode numbers, not changed titles or watched marks', () => {
+ const {catalogChanges} = require('./catalog-core.js');
+ const before = {seasons:[{number:1,episodes:[{number:1,seen:true}]}]};
+ const after = {seasons:[{number:1,episodes:[{number:1,title:'Nuevo',seen:true},{number:2}]},{number:2,episodes:[{number:1}]}]};
+ assert.deepEqual(catalogChanges(before,after),{seasons:1,episodes:2});
+ assert.deepEqual(catalogChanges(after,after),{seasons:0,episodes:0});
+ });

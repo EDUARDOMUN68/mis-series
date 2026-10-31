@@ -18,7 +18,7 @@
       channel.port1.onmessage = event => { clearTimeout(timer); channel.port1.close(); resolve(event.data); };
       controller.postMessage('SERIES_CACHE_VERSION', [channel.port2]);
     });
-    if (version !== 'mis-series-1.0.3') throw new Error('La app está renovando su versión. Recarga la página y vuelve a conectar; no borres los datos del sitio.');
+    if (version !== 'mis-series-1.0.4') throw new Error('La app está renovando su versión. Recarga la página y vuelve a conectar; no borres los datos del sitio.');
   }
 
   async function api(path, params = {}) {
@@ -153,20 +153,46 @@
     } catch(e) { message(e.message); }
     finally { catalogBusy = false; if ($('catalogAdd')) $('catalogAdd').disabled = false; }
   }
+  function showRefreshSummary(rows) {
+    let panel = $('catalogSummary');
+    if (!panel) {
+      panel = document.createElement('details'); panel.id = 'catalogSummary';
+      $('catalogStatus').after(panel);
+    }
+    panel.replaceChildren(); panel.open = true;
+    const heading = document.createElement('summary');
+    const ok = rows.filter(r => !r.error);
+    heading.textContent = `Resumen: ${ok.length} series consultadas · ${ok.reduce((n,r)=>n+r.seasons,0)} temporadas nuevas · ${ok.reduce((n,r)=>n+r.episodes,0)} capítulos nuevos · ${rows.length-ok.length} errores`;
+    panel.append(heading);
+    const list = document.createElement('ul');
+    for (const row of rows) {
+      const item = document.createElement('li');
+      item.textContent = row.name + ': ' + (row.error ? 'No se pudo actualizar. Se conservan sus datos.' : row.seasons || row.episodes ? `${row.seasons} temporadas nuevas y ${row.episodes} capítulos nuevos.` : 'Sin temporadas ni capítulos nuevos.');
+      list.append(item);
+    }
+    panel.append(list);
+    const note = document.createElement('p'); note.textContent = 'Tus vistos y notas se conservan. Los capítulos nuevos no confirman disponibilidad en España.';
+    panel.append(note);
+  }
   window.refreshCatalog = async function (automatic = false) {
     if (catalogBusy) return;
     if (!token) { if (!automatic) openCatalog(); return; }
     const linked = series.filter(s => s.tmdbId && (!automatic || (s.catalogCheckedAt && Date.now() - Date.parse(s.catalogCheckedAt) > 24*60*60*1000))).map(s => ({id:s.id, tmdbId:s.tmdbId}));
     if (!linked.length) { if (!automatic) text('catalogStatus','Vincula tus series desde su detalle para actualizar las temporadas.'); return; }
     catalogBusy = true; $('refreshCatalog').disabled = true;
-    let count = 0, failures = 0;
+    let count = 0, failures = 0; const rows = [];
     try {
       for (const s of linked) {
         text('catalogStatus', `Actualizando ${count + failures + 1} de ${linked.length}…`);
-        try { commitCatalog(s.id, await download(s.tmdbId), ''); count++; }
-        catch { failures++; }
+        try {
+          const incoming = await download(s.tmdbId);
+          const before = series.find(item => item.id === s.id);
+          const updated = commitCatalog(s.id, incoming, '');
+          rows.push({name:updated.name, ...SeriesCatalog.catalogChanges(before, updated)}); count++;
+        } catch { rows.push({name:series.find(item=>item.id===s.id)?.name || 'Serie eliminada', error:true}); failures++; }
       }
       text('catalogStatus', `${count} series actualizadas${failures ? '; ' + failures + ' sin actualizar (se conservan sus datos)' : ''}.`);
+      showRefreshSummary(rows);
     } finally { catalogBusy = false; $('refreshCatalog').disabled = false; }
   };
 

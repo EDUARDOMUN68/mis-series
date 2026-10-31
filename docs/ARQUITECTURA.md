@@ -23,3 +23,5 @@ La vinculación colectiva usa matchCandidates (nombre exacto normalizado, identi
 mergeImport valida la colección de entrada y combina temporadas y capítulos por número, con unión de marcas de visto. Conserva entradas locales que no estén en el archivo. Las claves misSeries.v1.before-import y misSeries.v1.before-catalog guardan la colección previa a la operación en el mismo dispositivo; no contienen el token y no son sincronización ni respaldo externo.
 
 Las pruebas Node cubren conservación de progreso, campos personales, actualizaciones parciales, idempotencia, región ES, vinculación y flujo asíncrono de búsqueda/descarga con respuestas simuladas. La conexión y cobertura real de TMDB deben comprobarse con el token introducido por el usuario.
+
+El resumen de actualización compara números de temporadas y episodios del estado anterior y del resultado guardado. No cuenta cambios de título como capítulos nuevos; muestra fallos sin alterar los datos de esa serie. Se representa con texto seguro y no se persiste en la colección.
