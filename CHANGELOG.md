@@ -1,5 +1,11 @@
 # Registro de cambios
 
+## 1.0.2 — 31 de octubre de 2026
+
+- Botón Vincular mis series: búsqueda colectiva, coincidencias exactas y únicas, elección manual de títulos dudosos con año y posibilidad de detener/reanudar.
+- Vinculación conserva identidad local, episodios, vistos y notas; impide vincular un mismo título a dos entradas. La descarga de nuevas temporadas sigue siendo una operación separada.
+- Buscador local renombrado Buscar en mis series y corregido orden de estilos para aplicar cabecera clara.
+
 ## 1.0.1 — 31 de octubre de 2026
 
 - Importar una copia recupera los vistos del archivo y conserva los ya marcados en el navegador. Una colección inicial sin vistos ya no anula el progreso del archivo importado.

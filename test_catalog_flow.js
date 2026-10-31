@@ -4,22 +4,23 @@ const vm = require('node:vm');
 const fs = require('node:fs');
 const core = require('./catalog-core');
 
-function harness({failSeason=false, onSeason=()=>{}}={}) {
+function harness({failSeason=false, onSeason=()=>{}, searchResults=null}={}) {
   const nodes = new Map();
+  let nodeCount=0;
   const node = id => {
     if (!nodes.has(id)) nodes.set(id,{id, value:'', hidden:false, children:[], textContent:'',innerHTML:'', disabled:false,
-      append(x){this.children.push(x)},replaceChildren(){this.children=[];this.innerHTML=''}, focus(){},showModal(){this.open=true},close(){this.open=false}});
+      append(x){this.children.push(x)},replaceChildren(){this.children=[];this.innerHTML=''},querySelector(selector){return node(this.id+selector)}, focus(){},showModal(){this.open=true},close(){this.open=false}});
     return nodes.get(id);
   };
   const store = new Map(), session = new Map(), routes=[];
   const context = vm.createContext({console, structuredClone, URL, AbortSignal, Date,SeriesCatalog:core,
-    document:{getElementById:node,createElement:()=>({}),addEventListener(){},visibilityState:'visible'},
+    document:{getElementById:node,createElement:()=>node('generated-'+nodeCount++),addEventListener(){},visibilityState:'visible'},
     sessionStorage:{getItem:k=>session.get(k),setItem:(k,v)=>session.set(k,v),removeItem:k=>session.delete(k)},
     localStorage:{getItem:k=>store.get(k)||null,setItem:(k,v)=>store.set(k,v)},
     async fetch(url,opts){
       assert.equal(opts.headers.Authorization,'Bearer TEST_ONLY'); assert.equal(url.origin,'https://api.themoviedb.org'); routes.push(url.pathname);
       let data={};
-      if(url.pathname.endsWith('/search/tv')) data={results:[{id:9,name:'Mi serie',first_air_date:'2026-01-01'}]};
+      if(url.pathname.endsWith('/search/tv')) data={results:searchResults||[{id:9,name:'Mi serie',first_air_date:'2026-01-01'}]};
       else if(url.pathname.endsWith('/watch/providers')) data={results:{ES:{flatrate:[{provider_id:8,provider_name:'Netflix'}]},US:{flatrate:[{provider_name:'No mostrar'}]}}};
       else if(url.pathname==='/3/tv/9') data={name:'Mi serie',seasons:[{season_number:1}]};
       else if(url.pathname==='/3/tv/9/season/1') {onSeason(context);if(failSeason)return{ok:false,status:500};data={episodes:[{id:91,episode_number:1,name:'Actualizado',air_date:'2026-10-01'},{id:92,episode_number:2,name:'Nuevo',air_date:'2026-11-01'}]};}
@@ -51,4 +52,19 @@ test('una serie borrada durante la descarga no reaparece',async()=>{
 });
 test('desconectar elimina token sin borrar colección',async()=>{
   const h=harness();await start(h);h.node('disconnectTMDB').onclick();assert.equal(h.session.size,0);assert.equal(h.store.size,0);
+});
+test('botón colectivo vincula coincidencia única sin cambiar episodios vistos',async()=>{
+  const h=harness();h.context.openCatalog();h.node('tmdbToken').value='TEST_ONLY';await h.node('connectTMDB').onclick();
+  vm.runInContext('series[0].seasons[0].episodes[0].seen=true',h.context);
+  await h.context.bulkLinkSeries();
+  const saved=JSON.parse(h.store.get('misSeries.v1'));
+  assert.equal(saved[0].tmdbId,9);assert.equal(saved[0].seasons[0].episodes[0].seen,true);assert.equal(saved[0].seasons[0].episodes.length,1);
+  assert.ok(h.node('bulkStatus').textContent.includes('1 vinculadas automáticamente'));
+});
+test('botón colectivo deja títulos ambiguos sin tocar y ofrece elección',async()=>{
+  const h=harness({searchResults:[{id:9,name:'Mi serie',first_air_date:'2020-01-01'},{id:10,name:'Mi serie',first_air_date:'2026-01-01'}]});
+  h.context.openCatalog();h.node('tmdbToken').value='TEST_ONLY';await h.node('connectTMDB').onclick();
+  await h.context.bulkLinkSeries();assert.equal(h.store.size,0);
+  assert.ok(h.node('bulkStatus').textContent.includes('1 por elegir'));
+  assert.equal(h.node('bulkRows').children[0].querySelector('.bulk-choices').children.length,4);
 });

@@ -18,7 +18,7 @@
       channel.port1.onmessage = event => { clearTimeout(timer); channel.port1.close(); resolve(event.data); };
       controller.postMessage('SERIES_CACHE_VERSION', [channel.port2]);
     });
-    if (version !== 'mis-series-1.0.1') throw new Error('La app está renovando su versión. Recarga la página y vuelve a conectar; no borres los datos del sitio.');
+    if (version !== 'mis-series-1.0.2') throw new Error('La app está renovando su versión. Recarga la página y vuelve a conectar; no borres los datos del sitio.');
   }
 
   async function api(path, params = {}) {
@@ -174,7 +174,7 @@
   window.openSeries = function (id) {
     originalOpen(id); const s = series.find(x => x.id === id); if (!s) return;
     const panel = document.createElement('section'); panel.className = 'catalog-info';
-    panel.innerHTML = `<h3>Dónde verla · España</h3>${s.tmdbId ? offersHTML(s.providersES) + attributionLink(s.providersES) + `<p class="muted">Consulta: ${esc(new Date(s.catalogCheckedAt).toLocaleDateString('es-ES'))}. Plataformas: JustWatch vía TMDB.</p>` : '<p>Vincula esta serie para consultar plataformas y capítulos nuevos.</p>'}`;
+    panel.innerHTML = `<h3>Dónde verla · España</h3>${s.tmdbId ? offersHTML(s.providersES) + attributionLink(s.providersES) + `<p class="muted">${s.catalogCheckedAt ? 'Temporadas consultadas: ' + esc(new Date(s.catalogCheckedAt).toLocaleDateString('es-ES')) : 'Vinculada. Pulsa Actualizar temporadas para consultar capítulos nuevos.'} Plataformas: JustWatch vía TMDB.</p>` : '<p>Vincula esta serie para consultar plataformas y capítulos nuevos.</p>'}`;
     const button = document.createElement('button'); button.className = 'secondary'; button.textContent = s.tmdbId ? 'Consultar otro título / vinculación' : 'Vincular con el catálogo';
     button.onclick = () => { $('seriesDetail').close(); openCatalog(id); }; panel.append(button);
     $('seriesDetailContent').append(panel);
@@ -190,6 +190,87 @@
   const originalExport = window.exportData;
   // Export already serializes only `series`; the token is deliberately outside that model.
   window.exportData = originalExport;
+
+  let bulkRunning = false, bulkStop = false, bulkChoiceButtons = [];
+  const bulkDialog = $('bulkDialog');
+  function storeLink(id, title, providers) {
+    // Always apply to the latest collection so marks made during network calls survive.
+    const next = SeriesCatalog.linkIdentity(series, id, title, providers);
+    const previous = localStorage.getItem(KEY);
+    if (previous && !localStorage.getItem(KEY + '.before-bulk-link')) localStorage.setItem(KEY + '.before-bulk-link', previous);
+    localStorage.setItem(KEY, JSON.stringify(next));
+    series = next; render();
+  }
+  function rowMessage(row, value) { row.querySelector('.bulk-state').textContent = value; }
+  async function linkChoice(id, title, row) {
+    if (catalogBusy) return;
+    catalogBusy = true;
+    rowMessage(row,'Vinculando…');
+    try {
+      const providers = SeriesCatalog.providersES(await api(`tv/${title.id}/watch/providers`));
+      storeLink(id,title,providers); rowMessage(row,`Vinculada con ${title.name}. Tus vistos siguen intactos.`);
+      row.querySelector('.bulk-choices').replaceChildren();
+    } catch(e) { rowMessage(row,e.message); }
+    finally { catalogBusy=false; }
+  }
+  function renderChoices(id, candidates, row) {
+    const choices=row.querySelector('.bulk-choices'); choices.replaceChildren();
+    for (const title of candidates) {
+      const button=document.createElement('button'); button.className='secondary';
+      button.disabled=bulkRunning;bulkChoiceButtons.push(button);
+      button.textContent=`${title.name} · ${title.first_air_date?.slice(0,4) || 'año sin confirmar'}`;
+      button.onclick=()=>linkChoice(id,title,row); choices.append(button);
+    }
+    const manual=document.createElement('button');manual.className='secondary';manual.textContent='Buscar otro título';
+    manual.disabled=bulkRunning;bulkChoiceButtons.push(manual);
+    manual.onclick=()=>{if(catalogBusy)return;bulkDialog.close();openCatalog(id);};choices.append(manual);
+    const skip=document.createElement('button');skip.className='secondary';skip.textContent='Dejar sin vincular';
+    skip.disabled=bulkRunning;bulkChoiceButtons.push(skip);
+    skip.onclick=()=>{if(catalogBusy)return;choices.replaceChildren();rowMessage(row,'Sin vincular. Puedes intentarlo de nuevo más adelante.');};choices.append(skip);
+  }
+  window.bulkLinkSeries = async function () {
+    if(catalogBusy || bulkRunning) { text('catalogStatus','Hay una consulta en curso. Espera a que termine.');return; }
+    if(!token){openCatalog();message('Conecta TMDB una vez. Después pulsa Vincular mis series.');return;}
+    $('bulkRows').replaceChildren();bulkChoiceButtons=[];text('bulkStatus','Preparando búsqueda…');
+    if(!bulkDialog.open)bulkDialog.showModal();
+    const pending=series.filter(s=>!s.tmdbId).map(s=>({id:s.id,name:s.name}));
+    if(!pending.length){text('bulkStatus','Todas tus series ya están vinculadas. Puedes actualizar sus temporadas.');return;}
+    bulkRunning=true;bulkStop=false;catalogBusy=true;
+    $('bulkStart').disabled=true;
+    let linked=0,review=0,errors=0;
+    try {
+      for(let i=0;i<pending.length;i++) {
+        if(bulkStop)break;
+        const item=pending[i];
+        // The series may have been removed or linked in another action during this run.
+        if(!series.some(s=>s.id===item.id&&!s.tmdbId))continue;
+        text('bulkStatus',`Buscando ${i+1} de ${pending.length}: ${item.name}`);
+        const row=document.createElement('article');row.className='bulk-row';
+        row.innerHTML='<strong></strong><p class="bulk-state" role="status"></p><div class="bulk-choices"></div>';
+        row.querySelector('strong').textContent=item.name;$('bulkRows').append(row);
+        rowMessage(row,'Buscando coincidencias…');
+        try {
+          const payload=await api('search/tv',{query:item.name,include_adult:'false'});
+          if(bulkStop){rowMessage(row,'Búsqueda detenida, sin cambios.');break;}
+          const match=SeriesCatalog.matchCandidates(item.name,payload,series.filter(s=>s.tmdbId).map(s=>s.tmdbId));
+          if(match.automatic){
+            const providers=SeriesCatalog.providersES(await api(`tv/${match.automatic.id}/watch/providers`));
+            if(bulkStop){rowMessage(row,'Detenido sin vincular esta serie.');break;}
+            storeLink(item.id,match.automatic,providers);linked++;
+            rowMessage(row,`Vinculada: ${match.automatic.name} (${match.automatic.first_air_date?.slice(0,4)||'sin año'}). Vistos conservados.`);
+          }else{
+            review++;rowMessage(row,match.candidates.length?'Elige el título y año correctos. No se ha cambiado esta serie.':'No hay una coincidencia disponible. Puedes buscar con otro nombre.');
+            renderChoices(item.id,match.candidates,row);
+          }
+        }catch(e){errors++;rowMessage(row,e.message);renderChoices(item.id,[],row);}
+      }
+      text('bulkStatus',`${bulkStop?'Búsqueda detenida. ':''}${linked} vinculadas automáticamente; ${review} por elegir; ${errors} consultas fallidas. Después puedes pulsar Actualizar temporadas.`);
+      text('catalogStatus',`${series.filter(s=>s.tmdbId).length} de ${series.length} series vinculadas. Tus vistos se conservan.`);
+    }finally{bulkRunning=false;catalogBusy=false;$('bulkStart').disabled=false;bulkChoiceButtons.forEach(button=>button.disabled=false);}
+  };
+  $('bulkClose').onclick=()=>{bulkStop=true;bulkDialog.close();};
+  $('bulkStop').onclick=()=>{bulkStop=true;text('bulkStatus','Deteniendo tras la consulta actual. Las series ya vinculadas se conservan.');};
+  $('bulkRefresh').onclick=()=>{if(catalogBusy)return;bulkDialog.close();refreshCatalog();};
   document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') refreshCatalog(true); });
   if (typeof navigator !== 'undefined' && navigator.serviceWorker) navigator.serviceWorker.register('./sw.js', {updateViaCache:'none'}).catch(() => {});
   if (token) refreshCatalog(true);

@@ -1,4 +1,4 @@
-# Mis Series 1.0.1
+# Mis Series 1.0.2
 
 Aplicación web personal para llevar el seguimiento de series y capítulos vistos. Funciona con archivos estáticos y guarda tu colección en el navegador.
 
@@ -10,6 +10,10 @@ Aplicación web personal para llevar el seguimiento de series y capítulos visto
 4. Consulta las plataformas en España, diferenciadas por suscripción, gratis, anuncios, compra o alquiler. Elige tu plataforma si quieres y añade la serie.
 
 Para una serie que ya tienes, abre su detalle y pulsa **Vincular con el catálogo**. Comprueba el título: esa vinculación permite añadir temporadas y capítulos sin duplicar tu colección.
+
+También puedes pulsar **Vincular mis series**: busca todas las que no estén vinculadas, de una en una. Vincula automáticamente solo un título único con nombre exacto (también nombre original); las búsquedas con varias páginas o títulos ambiguos requieren elegir. No transfiere un mismo título a dos entradas de la colección. Cada elección muestra nombre y año. Puedes detener la búsqueda y continuar más adelante, conservando las vinculaciones ya hechas.
+
+La vinculación colectiva conserva todos los capítulos, notas y vistos tal como estaban. Después pulsa **Actualizar temporadas** para descargar capítulos nuevos. La copia local previa a la primera vinculación colectiva se guarda separadamente del token.
 
 ## Actualizar conservando tus vistos
 

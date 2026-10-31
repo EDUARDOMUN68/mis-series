@@ -64,3 +64,21 @@ test('archivo malformado se rechaza sin modificar la colección',()=>{
   const {mergeImport}=require('./catalog-core');const old=[current()],copy=structuredClone(old);
   assert.throws(()=>mergeImport(old,[current(),{name:'Rota',seasons:[{number:1,episodes:null}]}]));assert.deepEqual(old,copy);
 });
+test('vinculación colectiva: solo coincidencia exacta única, no remakes ni páginas incompletas',()=>{
+  const {matchCandidates}=require('./catalog-core');
+  const title={id:9,name:'La casa del dragón',original_name:'House of the Dragon'};
+  assert.equal(matchCandidates('La casa del dragon',{results:[title],total_pages:1}).automatic.id,9);
+  assert.equal(matchCandidates('House of the Dragon',{results:[title]}).automatic.id,9);
+  assert.equal(matchCandidates('Dragón',{results:[title]}).automatic,null);
+  assert.equal(matchCandidates(title.name,{results:[title,{...title,id:10}],total_pages:1}).automatic,null);
+  assert.equal(matchCandidates(title.name,{results:[title],total_pages:2}).automatic,null);
+  assert.equal(matchCandidates(title.name,{results:[title]},[9]).automatic,null);
+});
+test('vincular identidad conserva todos los episodios, marcas y notas; evita dobles vínculos',()=>{
+  const {linkIdentity}=require('./catalog-core'), collection=[current()], snapshot=structuredClone(collection);
+  const linked=linkIdentity(collection,'mi-serie',{id:9,name:'TMDB'}, {region:'ES',offers:[]});
+  assert.equal(linked[0].tmdbId,9);assert.deepEqual(linked[0].seasons,snapshot[0].seasons);assert.equal(linked[0].notes,'No borrar');
+  assert.deepEqual(collection,snapshot);assert.equal(linked[0].catalogCheckedAt,undefined);
+  assert.throws(()=>linkIdentity([...linked,{...current(),id:'otra'}],'otra',{id:9,name:'TMDB'},{}));
+  assert.throws(()=>linkIdentity(collection,'eliminada',{id:9,name:'TMDB'},{}));
+});

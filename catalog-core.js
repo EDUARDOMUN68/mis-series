@@ -85,7 +85,28 @@
     }
     return result;
   }
-  const api = {mergeCatalog, providersES, mergeImport};
+  function matchCandidates(name, payload, linkedIds = []) {
+    const normal = text => String(text || '').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
+    const titles = [...new Map((payload.results || []).filter(t => Number.isInteger(t.id)).map(t => [t.id,t])).values()];
+    const exact = titles.filter(t => normal(name) === normal(t.name) || normal(name) === normal(t.original_name));
+    // A second page might contain another identically named show. Never guess a remake or a fuzzy title.
+    const automatic = exact.length === 1 && !(payload.total_pages > 1) && !linkedIds.includes(exact[0].id) ? exact[0] : null;
+    return {automatic, candidates:titles.filter(t => !linkedIds.includes(t.id)).slice(0,10)};
+  }
+  function linkIdentity(collection, targetId, title, providers) {
+    const next = structuredClone(collection);
+    const current = next.find(s => s.id === targetId);
+    if (!current) throw new Error('La serie ya no está en tu colección.');
+    if (current.tmdbId && current.tmdbId !== title.id) throw new Error('La serie ya fue vinculada a otro título.');
+    if (next.some(s => s.id !== targetId && s.tmdbId === title.id)) throw new Error('Ese título ya está vinculado a otra serie de tu colección.');
+    current.tmdbId = title.id;
+    current.catalogName = title.name;
+    current.catalogLinkedAt = new Date().toISOString();
+    current.providersES = structuredClone(providers);
+    // A link is not a successful season refresh. Leave catalogCheckedAt untouched.
+    return next;
+  }
+  const api = {mergeCatalog, providersES, mergeImport, matchCandidates, linkIdentity};
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else root.SeriesCatalog = api;
 })(typeof window === 'undefined' ? globalThis : window);
