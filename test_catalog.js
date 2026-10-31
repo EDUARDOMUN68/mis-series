@@ -90,3 +90,13 @@ test('vincular identidad conserva todos los episodios, marcas y notas; evita dob
  assert.deepEqual(catalogChanges(before,after),{seasons:1,episodes:2});
  assert.deepEqual(catalogChanges(after,after),{seasons:0,episodes:0});
  });
+
+test('season presentation hides empty catalog seasons and separates future originals without hiding seen marks',()=>{
+const {seasonGroup}=require('./catalog-core.js');const s={tmdbId:1};const day='2026-10-31';
+assert.equal(seasonGroup(s,{episodes:[]},day),'empty');
+assert.equal(seasonGroup(s,{episodes:[{originalAirDate:'2027-01-01'}]},day),'upcoming');
+assert.equal(seasonGroup(s,{episodes:[{originalAirDate:'2027-01-01',seen:true}]},day),'current');
+assert.equal(seasonGroup(s,{episodes:[{originalAirDate:null}]},day),'current');
+assert.equal(seasonGroup(s,{episodes:[{originalAirDate:day}]},day),'current');
+assert.equal(seasonGroup({}, {episodes:[]},day),'current');
+});

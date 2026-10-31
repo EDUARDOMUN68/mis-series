@@ -117,7 +117,15 @@
     }
     return {seasons, episodes};
   }
-  const api = {catalogChanges, mergeCatalog, providersES, mergeImport, matchCandidates, linkIdentity};
+  function seasonGroup(series, season, today) {
+    if (!series.tmdbId) return 'current';
+    const episodes = season.episodes || [];
+    if (!episodes.length) return 'empty';
+    if (episodes.some(e => e.seen)) return 'current';
+    if (episodes.every(e => e.originalAirDate && e.originalAirDate > today)) return 'upcoming';
+    return 'current';
+  }
+  const api = {seasonGroup, catalogChanges, mergeCatalog, providersES, mergeImport, matchCandidates, linkIdentity};
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else root.SeriesCatalog = api;
 })(typeof window === 'undefined' ? globalThis : window);

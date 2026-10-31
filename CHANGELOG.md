@@ -1,3 +1,7 @@
+# 1.0.5 — Temporadas futuras y vacías
+
+Las temporadas del catálogo sin capítulos se ocultan con una nota. Las que solo contienen episodios con fecha original futura y ninguno visto se agrupan en Próximas temporadas. Sin fecha confirmada permanecen visibles; no se infiere disponibilidad española. No se borran datos.
+
 # 1.0.4 — Resumen de actualización
 
 Al actualizar temporadas se muestra un resumen desplegable con temporadas y capítulos añadidos, series sin novedades y errores por serie. Se conservan vistos y notas.
