@@ -1,4 +1,4 @@
-# Mis Series 1.0.5
+# Mis Series 1.0.6
 
 Aplicación web personal para llevar el seguimiento de series y capítulos vistos. Funciona con archivos estáticos y guarda tu colección en el navegador.
 

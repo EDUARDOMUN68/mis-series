@@ -100,3 +100,13 @@ assert.equal(seasonGroup(s,{episodes:[{originalAirDate:null}]},day),'current');
 assert.equal(seasonGroup(s,{episodes:[{originalAirDate:day}]},day),'current');
 assert.equal(seasonGroup({}, {episodes:[]},day),'current');
 });
+
+test('actual detail renderer works with an older cached catalog helper',()=>{
+const fs=require('node:fs'),vm=require('node:vm');
+const html=fs.readFileSync(__dirname+'/index.html','utf8');
+const code=html.slice(html.indexOf('function displaySeasonGroup'),html.indexOf('function seasonHtml'));
+const context=vm.createContext({Intl,Date,SeriesCatalog:{},seasonHtml:(s,se)=>'Season '+se.number});
+vm.runInContext(code,context);
+const result=context.seriesSeasonsHtml({tmdbId:1,seasons:[{number:1,episodes:[{seen:true}]},{number:4,episodes:[]},{number:5,episodes:[{originalAirDate:'2099-01-01'}]}]});
+assert.ok(result.includes('Season 1'));assert.ok(result.includes('Season 5'));assert.ok(!result.includes('Season 4'));assert.ok(result.includes('upcoming-seasons'));
+});

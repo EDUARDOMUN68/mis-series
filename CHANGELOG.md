@@ -1,3 +1,7 @@
+# 1.0.6 — Apertura compatible durante actualizaciones
+
+El detalle ya no depende de la función nueva de catalog-core para separar temporadas. Permite abrir fichas aunque el navegador conserve una copia anterior de ese recurso.
+
 # 1.0.5 — Temporadas futuras y vacías
 
 Las temporadas del catálogo sin capítulos se ocultan con una nota. Las que solo contienen episodios con fecha original futura y ninguno visto se agrupan en Próximas temporadas. Sin fecha confirmada permanecen visibles; no se infiere disponibilidad española. No se borran datos.
