@@ -15,7 +15,7 @@ function harness({failSeason=false, onSeason=()=>{}}={}) {
   const context = vm.createContext({console, structuredClone, URL, AbortSignal, Date,SeriesCatalog:core,
     document:{getElementById:node,createElement:()=>({}),addEventListener(){},visibilityState:'visible'},
     sessionStorage:{getItem:k=>session.get(k),setItem:(k,v)=>session.set(k,v),removeItem:k=>session.delete(k)},
-    localStorage:{setItem:(k,v)=>store.set(k,v)},
+    localStorage:{getItem:k=>store.get(k)||null,setItem:(k,v)=>store.set(k,v)},
     async fetch(url,opts){
       assert.equal(opts.headers.Authorization,'Bearer TEST_ONLY'); assert.equal(url.origin,'https://api.themoviedb.org'); routes.push(url.pathname);
       let data={};

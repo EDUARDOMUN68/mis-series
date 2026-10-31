@@ -18,7 +18,7 @@
       channel.port1.onmessage = event => { clearTimeout(timer); channel.port1.close(); resolve(event.data); };
       controller.postMessage('SERIES_CACHE_VERSION', [channel.port2]);
     });
-    if (version !== 'mis-series-1.0.0') throw new Error('La app está renovando su versión. Recarga la página y vuelve a conectar; no borres los datos del sitio.');
+    if (version !== 'mis-series-1.0.1') throw new Error('La app está renovando su versión. Recarga la página y vuelve a conectar; no borres los datos del sitio.');
   }
 
   async function api(path, params = {}) {
@@ -134,6 +134,8 @@
     if (platformChoice) updated.platforms = [platformChoice];
     const next = series.slice();
     if (index < 0) next.push(updated); else next[index] = updated;
+    const previous = localStorage.getItem(KEY);
+    if (previous) localStorage.setItem(KEY + '.before-catalog', previous);
     localStorage.setItem(KEY, JSON.stringify(next)); // Storage failure leaves in-memory data intact too.
     series = next; render();
     return updated;

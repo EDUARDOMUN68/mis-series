@@ -16,6 +16,8 @@ Las ofertas por serie y temporada no demuestran disponibilidad española de cada
 
 ## Caché y comprobaciones
 
-sw.js versión mis-series-1.0.0 precarga recursos propios de interfaz. Solo intercepta esos recursos del mismo origen; nunca intercepta API externa ni persiste credenciales. Prioriza red y conserva respaldo sin conexión. La colección y el token no se gestionan mediante caché de red.
+sw.js versión mis-series-1.0.1 precarga recursos propios de interfaz. Solo intercepta esos recursos del mismo origen; nunca intercepta API externa ni persiste credenciales. Prioriza red y conserva respaldo sin conexión. La colección y el token no se gestionan mediante caché de red.
+
+mergeImport valida la colección de entrada y combina temporadas y capítulos por número, con unión de marcas de visto. Conserva entradas locales que no estén en el archivo. Las claves misSeries.v1.before-import y misSeries.v1.before-catalog guardan la colección previa a la operación en el mismo dispositivo; no contienen el token y no son sincronización ni respaldo externo.
 
 Las pruebas Node cubren conservación de progreso, campos personales, actualizaciones parciales, idempotencia, región ES, vinculación y flujo asíncrono de búsqueda/descarga con respuestas simuladas. La conexión y cobertura real de TMDB deben comprobarse con el token introducido por el usuario.

@@ -1,4 +1,4 @@
-# Mis Series 1.0.0
+# Mis Series 1.0.1
 
 Aplicación web personal para llevar el seguimiento de series y capítulos vistos. Funciona con archivos estáticos y guarda tu colección en el navegador.
 
@@ -26,6 +26,8 @@ Este producto usa la API de TMDB y no está respaldado ni certificado por TMDB. 
 ## Copias y privacidad
 
 **Exportar** e **Importar** siguen disponibles como copia de seguridad y traslado entre navegadores. No hay sincronización automática entre dispositivos. El token no se exporta ni se almacena en el repositorio; las consultas autenticadas no se guardan en la caché del service worker. No borres los datos del sitio para actualizar la interfaz: ahí se conserva tu progreso.
+
+Importar combina el progreso: un capítulo visto en cualquiera de las dos copias queda visto. No sirve para desmarcar capítulos en bloque; desmárcalos desde el detalle. Antes de importar o actualizar el catálogo se conserva una copia previa en el almacenamiento del mismo navegador. Esta copia no sustituye una exportación externa.
 
 ## Desarrollo
 

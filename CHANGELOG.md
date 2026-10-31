@@ -1,5 +1,11 @@
 # Registro de cambios
 
+## 1.0.1 — 31 de octubre de 2026
+
+- Importar una copia recupera los vistos del archivo y conserva los ya marcados en el navegador. Una colección inicial sin vistos ya no anula el progreso del archivo importado.
+- La importación valida el archivo completo antes de guardar y no elimina temporadas o episodios locales ausentes del archivo.
+- Copia local previa a importar o actualizar catálogo, separada del token. Conserva vinculación de catálogo al importar copias anteriores.
+
 ## 1.0.0 — 31 de octubre de 2026
 
 - Buscador TMDB y consulta de plataformas en España por serie y temporada, con categorías de oferta y atribución a JustWatch.

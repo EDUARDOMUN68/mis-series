@@ -46,3 +46,21 @@ test('la edición manual conserva metadatos y las exportaciones no incluyen cred
   assert.ok(source.includes('const obj={...old,id'));assert.ok(source.includes('return{...prev,number:j+1'));
   assert.ok(source.includes('JSON.stringify({version:1,exportedAt:new Date().toISOString(),series}'));
 });
+test('importar una copia marcada recupera vistos sobre una colección inicial a cero',()=>{
+  const {mergeImport}=require('./catalog-core');
+  const old=current();old.seasons[0].episodes[0].seen=false;old.tmdbId=9;
+  const backup=current();backup.seasons[0].episodes[0].seen=true;
+  const result=mergeImport([old],[backup]);
+  assert.equal(result[0].seasons[0].episodes[0].seen,true);assert.equal(result[0].tmdbId,9);
+  assert.equal(result.length,1);assert.equal(old.seasons[0].episodes[0].seen,false);
+});
+test('importar no desmarca vistos más recientes, no borra ausentes y no duplica tras repetir',()=>{
+  const {mergeImport}=require('./catalog-core');const old=current();old.seasons[0].episodes.push({number:2,seen:true});
+  const incoming=current();incoming.seasons[0].episodes[0].seen=false;
+  const once=mergeImport([old],[incoming]);const twice=mergeImport(once,[incoming]);
+  assert.equal(twice[0].seasons[0].episodes.length,2);assert.ok(twice[0].seasons[0].episodes.every(e=>e.seen));
+});
+test('archivo malformado se rechaza sin modificar la colección',()=>{
+  const {mergeImport}=require('./catalog-core');const old=[current()],copy=structuredClone(old);
+  assert.throws(()=>mergeImport(old,[current(),{name:'Rota',seasons:[{number:1,episodes:null}]}]));assert.deepEqual(old,copy);
+});
