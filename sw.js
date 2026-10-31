@@ -1,5 +1,5 @@
-const CACHE = 'mis-series-1.0.7';
-const ASSETS = ['./', './index.html', './manifest.json', './icon.svg', './catalog.css', './catalog-core.js', './catalog.js', './tmdb.svg'];
+const CACHE = 'mis-series-1.0.8';
+const ASSETS = ['./', './index.html', './manifest.json', './icon.svg', './icon-192.png', './icon-512.png', './catalog.css', './catalog-core.js', './catalog.js', './tmdb.svg'];
 self.addEventListener('message', event => {
   if (event.data === 'SERIES_CACHE_VERSION') event.ports[0]?.postMessage(CACHE);
 });

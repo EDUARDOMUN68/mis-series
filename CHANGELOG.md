@@ -1,3 +1,7 @@
+# 1.0.8 — Nuevo icono
+
+Icono de colección de series con pantalla y reproducción, fondo claro, azul y coral. PNG 192 y 512 para Android y manifest con zona segura para máscara.
+
 # 1.0.7 — Recordar conexión
 
 Opción voluntaria para recordar TMDB en este navegador. Sin marcarla se mantiene solo durante la sesión. Olvidar token elimina ambas copias sin borrar la colección. El token queda fuera de exportaciones y caché.
