@@ -1,4 +1,4 @@
-# Mis Series 1.0.6
+# Mis Series 1.0.7
 
 Aplicación web personal para llevar el seguimiento de series y capítulos vistos. Funciona con archivos estáticos y guarda tu colección en el navegador.
 
@@ -42,3 +42,5 @@ Ejecutar `python -m http.server 8001` y abrir http://localhost:8001. No necesita
 Al actualizar temporadas aparece un resumen por serie: temporadas y capítulos nuevos, ausencia de novedades y consultas fallidas. El resumen permanece en pantalla hasta la siguiente consulta o recarga.
 
 Presentación de temporadas TMDB: las vacías se ocultan con aviso, sin borrarlas; todas las fechas originales futuras y ningún visto pasan a Próximas temporadas. Las fechas desconocidas no se clasifican como futuras. Fecha de comparación Europe/Madrid. Esto no acredita disponibilidad en España.
+
+Conexión TMDB: por defecto sessionStorage; la casilla opcional Recordar conexión en este dispositivo guarda el token de lectura en localStorage, clave separada misSeries.tmdbToken. No se exporta. Desmarcar elimina la copia permanente y Olvidar token elimina ambas. Solo recomendable en dispositivo personal; no sincroniza otros dispositivos.

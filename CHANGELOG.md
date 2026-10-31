@@ -1,3 +1,7 @@
+# 1.0.7 — Recordar conexión
+
+Opción voluntaria para recordar TMDB en este navegador. Sin marcarla se mantiene solo durante la sesión. Olvidar token elimina ambas copias sin borrar la colección. El token queda fuera de exportaciones y caché.
+
 # 1.0.6 — Apertura compatible durante actualizaciones
 
 El detalle ya no depende de la función nueva de catalog-core para separar temporadas. Permite abrir fichas aunque el navegador conserve una copia anterior de ese recurso.

@@ -16,7 +16,7 @@ function harness({failSeason=false, onSeason=()=>{}, searchResults=null}={}) {
   const context = vm.createContext({console, structuredClone, URL, AbortSignal, Date,SeriesCatalog:core,
     document:{getElementById:node,createElement:()=>node('generated-'+nodeCount++),addEventListener(){},visibilityState:'visible'},
     sessionStorage:{getItem:k=>session.get(k),setItem:(k,v)=>session.set(k,v),removeItem:k=>session.delete(k)},
-    localStorage:{getItem:k=>store.get(k)||null,setItem:(k,v)=>store.set(k,v)},
+    localStorage:{getItem:k=>store.get(k)||null,setItem:(k,v)=>store.set(k,v),removeItem:k=>store.delete(k)},
     async fetch(url,opts){
       assert.equal(opts.headers.Authorization,'Bearer TEST_ONLY'); assert.equal(url.origin,'https://api.themoviedb.org'); routes.push(url.pathname);
       let data={};
@@ -69,4 +69,18 @@ test('botón colectivo deja títulos ambiguos sin tocar y ofrece elección',asyn
   await h.context.bulkLinkSeries();assert.equal(h.store.size,0);
   assert.ok(h.node('bulkStatus').textContent.includes('1 por elegir'));
   assert.equal(h.node('bulkRows').children[0].querySelector('.bulk-choices').children.length,4);
+});
+
+test('remember connection is optional, survives session loss and Forget removes both stores',async()=>{
+ const h=harness();h.context.openCatalog();h.node('rememberTMDB').checked=true;h.node('tmdbToken').value='TEST_ONLY';await h.node('connectTMDB').onclick();
+ assert.equal(h.store.get('misSeries.tmdbToken'),'TEST_ONLY');
+ h.session.clear();
+ vm.runInContext(fs.readFileSync(__dirname+'/catalog.js','utf8'),h.context);
+ h.context.openCatalog();assert.equal(h.node('catalogConnection').hidden,true);
+ h.node('disconnectTMDB').onclick();assert.equal(h.store.has('misSeries.tmdbToken'),false);assert.equal(h.session.size,0);
+});
+test('disabling remember keeps current session but removes durable token',async()=>{
+ const h=harness();h.context.openCatalog();h.node('rememberTMDB').checked=true;h.node('tmdbToken').value='TEST_ONLY';await h.node('connectTMDB').onclick();
+ h.node('rememberTMDB').checked=false;h.node('rememberTMDB').onchange();
+ assert.equal(h.store.has('misSeries.tmdbToken'),false);assert.equal(h.session.size,1);
 });

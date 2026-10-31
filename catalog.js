@@ -1,12 +1,25 @@
 'use strict';
 (() => {
   const TOKEN_KEY = 'misSeries.tmdbToken';
-  let token = sessionStorage.getItem(TOKEN_KEY) || '';
+  let remembered = '';
+  try { remembered = localStorage.getItem(TOKEN_KEY) || ''; } catch {}
+  let token = remembered || sessionStorage.getItem(TOKEN_KEY) || '';
   let catalogBusy = false, searchGeneration = 0, selectedTitle = null, linkId = null;
   const $ = id => document.getElementById(id);
   const text = (id, value) => { $(id).textContent = value; };
   const message = value => text('catalogMessage', value);
   const dialog = $('catalogDialog');
+  const rememberControl = $('rememberTMDB');
+  if (rememberControl) {
+    rememberControl.checked = !!remembered;
+    rememberControl.onchange = () => {
+      try {
+        if (rememberControl.checked && token) localStorage.setItem(TOKEN_KEY, token);
+        else localStorage.removeItem(TOKEN_KEY);
+        message(rememberControl.checked ? 'Se recordará la conexión en este dispositivo al conectar.' : 'Conexión solo durante esta sesión.');
+      } catch { rememberControl.checked = false; message('No se pudo recordar la conexión. Puedes usarla durante esta sesión.'); }
+    };
+  }
 
   async function checkCacheVersion() {
     // The legacy worker cached every URL, including external API calls. Wait for the safe worker.
@@ -18,7 +31,7 @@
       channel.port1.onmessage = event => { clearTimeout(timer); channel.port1.close(); resolve(event.data); };
       controller.postMessage('SERIES_CACHE_VERSION', [channel.port2]);
     });
-    if (version !== 'mis-series-1.0.6') throw new Error('La app está renovando su versión. Recarga la página y vuelve a conectar; no borres los datos del sitio.');
+    if (version !== 'mis-series-1.0.7') throw new Error('La app está renovando su versión. Recarga la página y vuelve a conectar; no borres los datos del sitio.');
   }
 
   async function api(path, params = {}) {
@@ -63,15 +76,18 @@
     $('connectTMDB').disabled = true; message('Comprobando conexión…');
     try {
       await api('configuration');
-      sessionStorage.setItem(TOKEN_KEY, token); input.value = '';
-      $('catalogConnection').hidden = true; message('TMDB conectado en esta pestaña. Ya puedes buscar.');
+      sessionStorage.setItem(TOKEN_KEY, token);
+      if (rememberControl?.checked) localStorage.setItem(TOKEN_KEY, token);
+      else localStorage.removeItem(TOKEN_KEY);
+      input.value = '';
+      $('catalogConnection').hidden = true; message(rememberControl?.checked ? 'TMDB conectado. Se recordará en este dispositivo.' : 'TMDB conectado durante esta sesión.');
       refreshCatalog(true);
     } catch(e) { token = previous; message(e.message); }
     finally { $('connectTMDB').disabled = false; }
   };
   $('disconnectTMDB').onclick = () => {
-    token = ''; sessionStorage.removeItem(TOKEN_KEY); $('tmdbToken').value = '';
-    message('Token eliminado de esta sesión. Tus series siguen guardadas.');
+    token = ''; sessionStorage.removeItem(TOKEN_KEY); localStorage.removeItem(TOKEN_KEY); if (rememberControl) rememberControl.checked = false; $('tmdbToken').value = '';
+    message('Token eliminado de este dispositivo y de esta sesión. Tus series siguen guardadas.');
   };
   $('catalogSearchForm').onsubmit = async event => {
     event.preventDefault(); const query = $('catalogQuery').value.trim();

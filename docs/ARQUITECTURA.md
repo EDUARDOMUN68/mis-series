@@ -27,3 +27,5 @@ Las pruebas Node cubren conservación de progreso, campos personales, actualizac
 El resumen de actualización compara números de temporadas y episodios del estado anterior y del resultado guardado. No cuenta cambios de título como capítulos nuevos; muestra fallos sin alterar los datos de esa serie. Se representa con texto seguro y no se persiste en la colección.
 
 Presentación de temporadas TMDB: las vacías se ocultan con aviso, sin borrarlas; todas las fechas originales futuras y ningún visto pasan a Próximas temporadas. Las fechas desconocidas no se clasifican como futuras. Fecha de comparación Europe/Madrid. Esto no acredita disponibilidad en España.
+
+Conexión TMDB: por defecto sessionStorage; la casilla opcional Recordar conexión en este dispositivo guarda el token de lectura en localStorage, clave separada misSeries.tmdbToken. No se exporta. Desmarcar elimina la copia permanente y Olvidar token elimina ambas. Solo recomendable en dispositivo personal; no sincroniza otros dispositivos.
