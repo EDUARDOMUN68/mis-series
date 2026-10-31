@@ -60,6 +60,8 @@ test('botón colectivo vincula coincidencia única sin cambiar episodios vistos'
   const saved=JSON.parse(h.store.get('misSeries.v1'));
   assert.equal(saved[0].tmdbId,9);assert.equal(saved[0].seasons[0].episodes[0].seen,true);assert.equal(saved[0].seasons[0].episodes.length,1);
   assert.ok(h.node('bulkStatus').textContent.includes('1 vinculadas automáticamente'));
+  await h.context.refreshCatalog(true);
+  assert.ok(!h.routes.some(route=>route.includes('/season/')),'vincular no debe descargar temporadas hasta la primera actualización explícita');
 });
 test('botón colectivo deja títulos ambiguos sin tocar y ofrece elección',async()=>{
   const h=harness({searchResults:[{id:9,name:'Mi serie',first_air_date:'2020-01-01'},{id:10,name:'Mi serie',first_air_date:'2026-01-01'}]});

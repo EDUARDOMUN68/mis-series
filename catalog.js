@@ -156,7 +156,7 @@
   window.refreshCatalog = async function (automatic = false) {
     if (catalogBusy) return;
     if (!token) { if (!automatic) openCatalog(); return; }
-    const linked = series.filter(s => s.tmdbId && (!automatic || !s.catalogCheckedAt || Date.now() - Date.parse(s.catalogCheckedAt) > 24*60*60*1000)).map(s => ({id:s.id, tmdbId:s.tmdbId}));
+    const linked = series.filter(s => s.tmdbId && (!automatic || (s.catalogCheckedAt && Date.now() - Date.parse(s.catalogCheckedAt) > 24*60*60*1000))).map(s => ({id:s.id, tmdbId:s.tmdbId}));
     if (!linked.length) { if (!automatic) text('catalogStatus','Vincula tus series desde su detalle para actualizar las temporadas.'); return; }
     catalogBusy = true; $('refreshCatalog').disabled = true;
     let count = 0, failures = 0;

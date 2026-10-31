@@ -15,6 +15,8 @@ También puedes pulsar **Vincular mis series**: busca todas las que no estén vi
 
 La vinculación colectiva conserva todos los capítulos, notas y vistos tal como estaban. Después pulsa **Actualizar temporadas** para descargar capítulos nuevos. La copia local previa a la primera vinculación colectiva se guarda separadamente del token.
 
+Las series vinculadas colectivamente esperan esa primera actualización explícita. A partir de ella participan en la revisión diaria automática.
+
 ## Actualizar conservando tus vistos
 
 **Actualizar temporadas** consulta las series vinculadas a TMDB. También se revisan al conectar, abrir o volver a la app si la última comprobación tiene más de 24 horas y el token sigue disponible. No hay tareas en segundo plano con la app cerrada. Tras cerrar la sesión del navegador tendrás que volver a introducir el token.
