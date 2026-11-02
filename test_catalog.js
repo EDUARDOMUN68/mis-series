@@ -110,3 +110,13 @@ vm.runInContext(code,context);
 const result=context.seriesSeasonsHtml({tmdbId:1,seasons:[{number:1,episodes:[{seen:true}]},{number:4,episodes:[]},{number:5,episodes:[{originalAirDate:'2099-01-01'}]}]});
 assert.ok(result.includes('Season 1'));assert.ok(result.includes('Season 5'));assert.ok(!result.includes('Season 4'));assert.ok(result.includes('upcoming-seasons'));
 });
+
+test('detail batches multiple marks without saving or closing until Save, preserves newer metadata',()=>{
+ const fs=require('node:fs'),vm=require('node:vm');const html=fs.readFileSync(__dirname+'/index.html','utf8');
+ const code=html.slice(html.indexOf('function detailSeries('),html.indexOf('function openEditor('));
+ let writes=0,closes=0;const ctx=vm.createContext({structuredClone,Map,console,localStorage:{setItem(){writes++}},document:{querySelectorAll:()=>[],getElementById:()=>({close(){closes++},addEventListener(){}})},alert:msg=>{throw Error(msg)},isAvailable:()=>true,updateSeasonDates(){},render(){},toast(){}});
+ vm.runInContext(`const KEY='test';let series=[{id:'a',name:'Serie',notes:'original',seasons:[{number:1,episodes:[{number:1,seen:false},{number:2,seen:false}]}]}];let detailDraft=null;`+code,ctx);
+ ctx.toggleEp('a',1,1,true);ctx.toggleEp('a',1,2,true);assert.equal(writes,0);assert.equal(closes,0);
+ vm.runInContext("series[0].notes='newer'",ctx);ctx.saveDetail();assert.equal(writes,1);assert.equal(closes,1);
+ assert.equal(vm.runInContext('series[0].seasons[0].episodes.every(e=>e.seen)',ctx),true);assert.equal(vm.runInContext('series[0].notes',ctx),'newer');
+});

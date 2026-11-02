@@ -1,3 +1,7 @@
+# 1.0.11 — Marcar varios capítulos y guardar
+
+Eliminar pasa arriba en rojo. Guardar queda abajo en verde. Marcar capítulos o temporadas mantiene abierta la ficha y no reconstruye sus desplegables; se guardan conjuntamente al pulsar Guardar. Escape pide confirmación si hay marcas pendientes. Editar guarda previamente las marcas; borrar sigue requiriendo confirmación.
+
 # 1.0.10 — Acciones compactas
 
 Buscar, Vincular y Actualizar en una fila. Eliminado texto inicial de conexión de la pantalla principal; se mantienen avisos de progreso y resultados.
