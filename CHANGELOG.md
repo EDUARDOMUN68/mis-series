@@ -1,3 +1,7 @@
+# 1.0.12 — Información al pie sin repeticiones
+
+Notas y plataformas al pie, después de Editar/Guardar. Retiradas plataformas y avisos repetidos dentro de cada temporada. El pie conserva diferencias de plataformas por temporada cuando existen.
+
 # 1.0.11 — Marcar varios capítulos y guardar
 
 Eliminar pasa arriba en rojo. Guardar queda abajo en verde. Marcar capítulos o temporadas mantiene abierta la ficha y no reconstruye sus desplegables; se guardan conjuntamente al pulsar Guardar. Escape pide confirmación si hay marcas pendientes. Editar guarda previamente las marcas; borrar sigue requiriendo confirmación.

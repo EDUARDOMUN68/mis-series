@@ -31,7 +31,7 @@
       channel.port1.onmessage = event => { clearTimeout(timer); channel.port1.close(); resolve(event.data); };
       controller.postMessage('SERIES_CACHE_VERSION', [channel.port2]);
     });
-    if (version !== 'mis-series-1.0.11') throw new Error('La app está renovando su versión. Recarga la página y vuelve a conectar; no borres los datos del sitio.');
+    if (version !== 'mis-series-1.0.12') throw new Error('La app está renovando su versión. Recarga la página y vuelve a conectar; no borres los datos del sitio.');
   }
 
   async function api(path, params = {}) {
@@ -220,14 +220,6 @@
     const button = document.createElement('button'); button.className = 'secondary'; button.textContent = s.tmdbId ? 'Consultar otro título / vinculación' : 'Vincular con el catálogo';
     button.onclick = () => { $('seriesDetail').close(); openCatalog(id); }; panel.append(button);
     $('seriesDetailContent').append(panel);
-  };
-  const originalSeason = window.seasonHtml;
-  window.seasonHtml = function (s, season) {
-    let html = originalSeason(s, season);
-    if (!s.tmdbId) return html;
-    const info = `<div class="season-catalog"><strong>Temporada ${season.number} · España</strong>${offersHTML(season.providersES)}<p>Fechas de emisión original; disponibilidad por capítulo en España sin confirmar. Puedes marcar los que ya has visto.</p></div>`;
-    html = html.replace('<div class="season-actions">', info + '<div class="season-actions">');
-    return html;
   };
   const originalExport = window.exportData;
   // Export already serializes only `series`; the token is deliberately outside that model.
