@@ -1,3 +1,7 @@
+# 1.0.9 — Cabecera compacta
+
+Título y versión en una sola línea para ahorrar espacio vertical, también en móvil.
+
 # 1.0.8 — Nuevo icono
 
 Icono de colección de series con pantalla y reproducción, fondo claro, azul y coral. PNG 192 y 512 para Android y manifest con zona segura para máscara.

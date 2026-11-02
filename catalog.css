@@ -3,3 +3,5 @@ header{background:#fff;color:#0f172a;border-bottom:3px solid #bfdbfe}header smal
 #bulkDialog{max-height:92vh;overflow:auto}.bulk-row{padding:14px;border:1px solid #dbe3ee;border-radius:14px;margin:10px 0;background:#fff}.bulk-state{font-size:.9rem;color:#475569}.bulk-choices{display:flex;gap:7px;flex-wrap:wrap}.bulk-choices button{text-align:left;font-weight:650;font-size:.9rem}#bulkStatus{line-height:1.5}
 
 .remember-connection{display:flex;align-items:center;gap:10px;margin:14px 0}.remember-connection input[type="checkbox"]{width:22px;height:22px;flex-shrink:0}
+
+.app-heading{display:flex;align-items:baseline;justify-content:space-between;gap:12px}.app-heading h1{margin:0;min-width:0}.app-heading small{display:inline;margin:0;white-space:nowrap;font-size:.85rem}
