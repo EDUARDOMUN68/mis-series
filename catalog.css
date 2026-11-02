@@ -5,3 +5,5 @@ header{background:#fff;color:#0f172a;border-bottom:3px solid #bfdbfe}header smal
 .remember-connection{display:flex;align-items:center;gap:10px;margin:14px 0}.remember-connection input[type="checkbox"]{width:22px;height:22px;flex-shrink:0}
 
 .app-heading{display:flex;align-items:baseline;justify-content:space-between;gap:12px}.app-heading h1{margin:0;min-width:0}.app-heading small{display:inline;margin:0;white-space:nowrap;font-size:.85rem}
+
+.catalog-toolbar>button{flex:1 1 0;min-width:0;padding:12px 6px;font-size:.88rem;white-space:nowrap}.catalog-toolbar p:empty{display:none}

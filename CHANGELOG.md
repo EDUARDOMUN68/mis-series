@@ -1,3 +1,7 @@
+# 1.0.10 — Acciones compactas
+
+Buscar, Vincular y Actualizar en una fila. Eliminado texto inicial de conexión de la pantalla principal; se mantienen avisos de progreso y resultados.
+
 # 1.0.9 — Cabecera compacta
 
 Título y versión en una sola línea para ahorrar espacio vertical, también en móvil.
